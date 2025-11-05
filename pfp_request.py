@@ -7,13 +7,13 @@ from team_dict import nfl_teams
 from league_info import nfl_conference_division
 
 # Line Breaks for formatting
-line_break = '-' * 70
+Line_break = '-' * 70
 
 # Introduction to program
 print("""
 NFL PFP Data Request Program!   
       """) # For formatting only
-print(line_break) # For formatting only
+print(Line_break) # For formatting only
 
 # Request team information for analysis
 while True:
@@ -35,24 +35,16 @@ while True:
         start_season = int(input('Enter the starting season: '))
         end_season = int(input('Enter the ending season: '))
         if start_season < 2002 or end_season > 2025: # Considers Houston Texans inception in 2002
-            print("""
-Seasons must be between 2002 and 2025. Please re-enter the seasons.
-                  """)
+            print('Seasons must be between 2002 and 2025. Please re-enter the seasons.')
             continue
         elif start_season > end_season:
-            print("""
-Starting season must be less than or equal to the ending season. Please re-enter the seasons.
-                  """)
+            print('Starting season must be less than or equal to the ending season. Please re-enter the seasons.')
             continue
         else:
-            print(f"""
-We will retrieve PFP data for the {team} from {start_season} to {end_season}.
-                  """)
+            print(f'We will retrieve PFP data for the {team} from {start_season} to {end_season}.')
             break
     except ValueError:
-        print("""
-Invalid input. Please enter valid season years.
-              """)
+        print('Invalid input. Please enter valid season years.')
         continue
 
 # Scrape PFP data
@@ -67,6 +59,7 @@ column_rename = {
 }
 
 # Time calculation start - testing purposes
+# PFP requests should be limited to no more than 10 requests per minute
 start_time = time.time()
 
 # Create list of seasons
@@ -118,7 +111,8 @@ for season in seasons:
     df = pd. concat([df, merged_df], ignore_index=True)
 
     # Pause to avoid breaking PFP Policies (no more than 10 requests in one minute)
-    time.sleep(random.randint(8,12)) # randomly sleeps between 8 and 12 seconds
+    random_seed = random.randint(8,12) # randomly sleeps between 8 and 12 seconds
+    time.sleep(random_seed) 
 
 
 # Get the end time and print the time taken
@@ -177,14 +171,14 @@ for opp in df['Opp']:
 result_pos = df.columns.get_loc('Result')
 
 # Insert new columns into data frame
-df.insert(result_pos, 'Opp_Conference', opp_conference)
 df.insert(result_pos, 'Opp_Division', opp_divisions)
+df.insert(result_pos, 'Opp_Conference', opp_conference)
 
 # Display final data frame information and time taken
 print(f"""
 
 Final Result for {team} PFP data retrieval request for the {start_season} to {end_season} seasons:
-{line_break}
+{Line_break}
 """)
 print(df.info())
 
