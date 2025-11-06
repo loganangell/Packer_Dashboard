@@ -3,15 +3,23 @@ import numpy as np
 import pandas as pd
 import random
 import time
+from datetime import datetime
 from team_dict import nfl_teams
 from league_info import nfl_conference_division
 
 # Line Breaks for formatting
 Line_break = '-' * 70
 
+# Calculates today's date for requesting seasons that have completed games
+current_year = datetime.now().year
+today = pd.Timestamp.today().normalize()
+
 # Introduction to program
-print("""
+print(f"""
 NFL PFP Data Request Program!   
+
+This program allows you to request Pro-Football-Reference (PFP) data 
+for a specific NFL team from the 2002 to {current_year} seasons.
       """) # For formatting only
 print(Line_break) # For formatting only
 
@@ -34,14 +42,15 @@ while True:
     try:
         start_season = int(input('Enter the starting season: '))
         end_season = int(input('Enter the ending season: '))
-        if start_season < 2002 or end_season > 2025: # Considers Houston Texans inception in 2002
-            print('Seasons must be between 2002 and 2025. Please re-enter the seasons.')
+        if start_season < 2002 or end_season > current_year : # Considers Houston Texans inception in 2002
+            print(f'Seasons must be between 2002 and {current_year}. Please re-enter the seasons.')
             continue
         elif start_season > end_season:
             print('Starting season must be less than or equal to the ending season. Please re-enter the seasons.')
             continue
         else:
             print(f'We will retrieve PFP data for the {team} from {start_season} to {end_season}.')
+            print(Line_break)
             break
     except ValueError:
         print('Invalid input. Please enter valid season years.')
@@ -132,6 +141,11 @@ df['Result'] = np.where(df['Result'] == 'W', 'W', 'L')
 # Convert 'OT' column to boolean and ensure no records are empty
 df['OT'] = np.where(df['OT'] == 'OT', 'True', 'False')
 
+# Remove records where the date is beyond date of script execution
+df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+today = pd.Timestamp.today().normalize()
+df = df[df['Date'] <= today]
+
 # Update data frame to include conference and division information
 def get_conference_division(team_abbr):
     """
@@ -177,14 +191,14 @@ df.insert(result_pos, 'Opp_Conference', opp_conference)
 # Display final data frame information and time taken
 print(f"""
 
-Final Result for {team} PFP data retrieval request for the {start_season} to {end_season} seasons:
+{team} PFP data retrieval request for the {start_season} to {end_season} seasons:
 {Line_break}
 """)
 print(df.info())
 
 print(f"""
 Time Elapsed Information:
-------------------------------------------
+{Line_break}
 Elapsed time: {end_time - start_time:.2f} seconds
 Average time per season: {(end_time - start_time)/len(seasons):.2f} seconds
 """)
